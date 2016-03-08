@@ -3,8 +3,7 @@ SSHKeyDistribut0r has been written to make SSH key distribution easier for sysop
 # How to use
 ## Install dependencies
 ```
-pip install paramiko
-pip install paramiko_scp
+pip install -r requirements.txt
 ```
 
 ## Create configuration files
