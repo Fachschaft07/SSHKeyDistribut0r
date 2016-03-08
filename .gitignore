@@ -122,3 +122,5 @@ target/
 # dotenv
 .env
 
+keys.json
+servers.json
