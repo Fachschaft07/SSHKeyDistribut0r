@@ -4,10 +4,10 @@ import os
 import json
 import shutil
 import socket
+import sys
 
 import paramiko
 import scp
-
 
 CLEANUP_AFTER = True
 TMP_DIR_PATH = 'tmp'
@@ -93,9 +93,9 @@ if __name__ == '__main__':
     print
     print 'SSHKeyDistribut0r'
     print '================='
-    print 'Welcome in the world of key distribution dude!'
+    print 'Welcome to the world of key distribution!'
     print
     try:
         main()
     except KeyboardInterrupt:
-        exit()
+        sys.exit(1)
