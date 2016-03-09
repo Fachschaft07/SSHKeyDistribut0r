@@ -1,5 +1,7 @@
 SSHKeyDistribut0r has been written to make SSH key distribution easier for sysop teams.
 
+![Screenshot](http://i.imgur.com/qoKm9dl.png)
+
 # How to use
 ## Install dependencies
 ```
