@@ -59,8 +59,9 @@ def main():
                 #user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
                 user_name = authorized_user
                 server_users.append(user_name)
-                for key in keys[authorized_user]['keys']:
-                    key_file.write('%s\n' % key)
+                if authorized_user in keys.keys():
+                    for key in keys[authorized_user]['keys']:
+                        key_file.write('%s\n' % key)
             key_file.close()
 
             # Configure SSH client
@@ -81,6 +82,9 @@ def main():
 
             except paramiko.ssh_exception.NoValidConnectionsError:
                 error_log(server['ip'], server['comment'], 'Cannot connect to server.')
+            except paramiko.ssh_exception.PasswordRequiredException:
+                error_log(server['ip'], server['comment'],
+                          'Cannot connect to server because of an authentication problem.')
             except socket.timeout:
                 error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:
