@@ -56,7 +56,8 @@ def main():
 
             # Write all keys of users with permissions for this server
             for authorized_user in server['authorized_users']:
-                user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
+                #user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
+                user_name = authorized_user
                 server_users.append(user_name)
                 for key in keys[authorized_user]['keys']:
                     key_file.write('%s\n' % key)
@@ -97,5 +98,6 @@ if __name__ == '__main__':
     print
     try:
         main()
+        print
     except KeyboardInterrupt:
         sys.exit(1)
