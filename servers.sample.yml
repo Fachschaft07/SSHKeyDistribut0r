@@ -1,0 +1,27 @@
+---
+- ip: 10.0.0.1
+  port: 22
+  user: admin
+  comment: samba server
+  authorized_users: [monica]
+- ip: 10.0.0.2
+  port: 22
+  user: admin
+  comment: monitoring server
+  authorized_users: [monica]
+- ip: 10.0.0.3
+  port: 22
+  user: admin
+  comment: 1st workstation
+  authorized_users: [monica, andy, shannon]
+- ip: 10.0.0.4
+  port: 22
+  user: admin
+  comment: 2nd workstation
+  authorized_users: [monica, andy, shannon]
+- ip: 10.0.0.5
+  port: 22
+  user: admin
+  comment: file server
+  authorized_users: [andrew, shannon, monica]
+...

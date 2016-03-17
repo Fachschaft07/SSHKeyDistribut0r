@@ -2,6 +2,7 @@
 
 import os
 import json
+import yaml
 import shutil
 import socket
 import sys
@@ -11,8 +12,8 @@ import scp
 
 CLEANUP_AFTER = True
 TMP_DIR_PATH = 'tmp'
-KEYS_FILE_NAME = 'keys.json'
-SERVERS_FILE_NAME = 'servers.json'
+KEYS_FILE_NAME = 'keys.yml'
+SERVERS_FILE_NAME = 'servers.yml'
 TIMEOUT_ON_CONNECT = 2  # in seconds
 
 # Colors for console outputs
@@ -30,22 +31,46 @@ def remove_special_chars(original_string):
     return ''.join(e for e in original_string if e.isalnum())
 
 
-def error_log(ip, comment, message):
-    print u'%s✗ %s/%s - Error: %s%s' % (COLOR_RED, ip, comment, message, COLOR_END)
+def error_log(message):
+    print u'%s✗ Error: %s%s' % (COLOR_RED, message, COLOR_END)
 
 
-def info_log(ip, comment, users):
-    print u'%s✓ %s/%s - Access granted for: %s%s' % (COLOR_GREEN, ip, comment, users, COLOR_END)
+def server_error_log(ip, comment, message):
+    error_log('%s/%s - %s' % (ip, comment, message))
+
+
+def info_log(message):
+    print u'%s✓ %s%s' % (COLOR_GREEN, message, COLOR_END)
+
+
+def server_info_log(ip, comment, users):
+    info_log('%s/%s - %s' % (ip, comment, users))
 
 
 def main():
-    # Cleanup
-    cleanup()
-    os.makedirs(TMP_DIR_PATH)
-
     # Load config files
-    servers = json.load(open(SERVERS_FILE_NAME))
-    keys = json.load(open(KEYS_FILE_NAME))
+    try:
+        if SERVERS_FILE_NAME.endswith('.yml'):
+            servers = yaml.load(open(SERVERS_FILE_NAME))
+        elif SERVERS_FILE_NAME.endswith('.json'):
+            servers = json.load(open(SERVERS_FILE_NAME))
+        else:
+            error_log('Configuration file extension not supported. Please use .json or .yml.')
+            return
+
+        if KEYS_FILE_NAME.endswith('.json'):
+            keys = json.load(open(KEYS_FILE_NAME))
+        elif KEYS_FILE_NAME.endswith('.yml'):
+            keys = yaml.load(open(KEYS_FILE_NAME))
+        else:
+            error_log('Configuration file extension not supported. Please use .json or .yml.')
+            return
+    except yaml.scanner.ScannerError:
+        error_log('Cannot parse malformed YAML configuration file.')
+        return
+    except ValueError:
+        error_log('Cannot parse malformed JSON configuration file.')
+        return
 
     for server in servers:
         if len(server['authorized_users']) > 0:
@@ -56,7 +81,7 @@ def main():
 
             # Write all keys of users with permissions for this server
             for authorized_user in server['authorized_users']:
-                #user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
+                # user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
                 user_name = authorized_user
                 server_users.append(user_name)
                 if authorized_user in keys.keys():
@@ -75,23 +100,23 @@ def main():
                 scp_client = scp.SCPClient(ssh_client.get_transport())
 
                 # Upload key file
-                scp_client.put('%s/%s' % (TMP_DIR_PATH, key_file_name), remote_path='.ssh/authorized_keys')
+                remote_path = '.ssh/authorized_keys'
+                scp_client.put('%s/%s' % (TMP_DIR_PATH, key_file_name), remote_path=remote_path)
                 scp_client.close()
 
-                info_log(server['ip'], server['comment'], ', '.join(server_users))
+                server_info_log(server['ip'], server['comment'], ', '.join(server_users))
 
             except paramiko.ssh_exception.NoValidConnectionsError:
-                error_log(server['ip'], server['comment'], 'Cannot connect to server.')
+                server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
             except paramiko.ssh_exception.PasswordRequiredException:
-                error_log(server['ip'], server['comment'],
-                          'Cannot connect to server because of an authentication problem.')
+                server_error_log(server['ip'], server['comment'],
+                                 'Cannot connect to server because of an authentication problem.')
+            except scp.SCPException:
+                server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
             except socket.timeout:
-                error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
+                server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:
-            error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
-
-    if CLEANUP_AFTER:
-        cleanup()
+            server_error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
 
 
 if __name__ == '__main__':
@@ -101,7 +126,11 @@ if __name__ == '__main__':
     print 'Welcome to the world of key distribution!'
     print
     try:
+        cleanup()
+        os.makedirs(TMP_DIR_PATH)
         main()
         print
+        if CLEANUP_AFTER:
+            cleanup()
     except KeyboardInterrupt:
         sys.exit(1)

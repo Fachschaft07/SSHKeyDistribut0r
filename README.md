@@ -9,18 +9,19 @@ pip install -r requirements.txt
 ```
 
 ## Create configuration files
+First, copy the YAML files and customize them. Use the corresponding
+.json files if you prefer the JSON structure.
 ```
-cp keys.sample.json keys.json
-cp servers.sample.json servers.json
+cp keys.sample.yml keys.yml
+cp servers.sample.yml servers.yml
 ```
-The keys.json file has to contain all users which are used in the
-servers.json file. Every entry in the JSON dictionary requires the
+The keys.yml file has to contain all users which are used in the
+servers.yml file. Every entry in the YML structure requires the
 following attributes:
-The `fullname` is a string value to mention the full name of the person.
+The `fullname` is a string value to mention the full name of a person.
 `keys` is a list of SSH keys in the format `ssh-rsa <KEY> <comment>`.
-The dictionary keys are used to declare the username.
 
-The servers.json file contains all servers with the specified user
+The servers.yml file contains all servers with the specified user
 permissions. It consists of a list of dictionaries with the following
 attributes:
 * `ip`: String value in the format `XXX.XXX.XXX.XXX`
@@ -28,7 +29,7 @@ attributes:
 * `user`: String value which specifies the system user to log in.
 * `comment`: String value to describe the system
 * `authorized_users`: List of strings which specify a user. Every user
-    has to be declared in the keys.json file as a key.
+    has to be declared in the keys.yml file as a key.
 
 ## Execute SSHKeyDistribut0r
 ```
