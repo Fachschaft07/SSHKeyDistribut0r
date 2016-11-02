@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import json
 import yaml
 import shutil
 import socket
@@ -52,24 +51,17 @@ def main():
     try:
         if SERVERS_FILE_NAME.endswith('.yml'):
             servers = yaml.load(open(SERVERS_FILE_NAME))
-        elif SERVERS_FILE_NAME.endswith('.json'):
-            servers = json.load(open(SERVERS_FILE_NAME))
         else:
             error_log('Configuration file extension not supported. Please use .json or .yml.')
             return
 
-        if KEYS_FILE_NAME.endswith('.json'):
-            keys = json.load(open(KEYS_FILE_NAME))
-        elif KEYS_FILE_NAME.endswith('.yml'):
+        if KEYS_FILE_NAME.endswith('.yml'):
             keys = yaml.load(open(KEYS_FILE_NAME))
         else:
             error_log('Configuration file extension not supported. Please use .json or .yml.')
             return
     except yaml.scanner.ScannerError:
         error_log('Cannot parse malformed YAML configuration file.')
-        return
-    except ValueError:
-        error_log('Cannot parse malformed JSON configuration file.')
         return
 
     for server in servers:
