@@ -124,6 +124,6 @@ target/
 
 keys.json
 servers.json
-keys.yml
-servers.yml
+config/keys.yml
+config/servers.yml
 tmp

@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ```
 
 ## Create configuration files
-First, copy the YAML files and customize them.
+First, copy the YAML files in the config directory and customize them.
 ```
 cp keys.sample.yml keys.yml
 cp servers.sample.yml servers.yml

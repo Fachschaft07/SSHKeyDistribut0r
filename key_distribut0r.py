@@ -11,8 +11,8 @@ import scp
 
 CLEANUP_AFTER = True
 TMP_DIR_PATH = 'tmp'
-KEYS_FILE_NAME = 'keys.yml'
-SERVERS_FILE_NAME = 'servers.yml'
+KEYS_FILE_NAME = 'config/keys.yml'
+SERVERS_FILE_NAME = 'config/servers.yml'
 TIMEOUT_ON_CONNECT = 2  # in seconds
 
 # Colors for console outputs
