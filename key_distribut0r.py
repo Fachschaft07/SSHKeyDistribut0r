@@ -5,9 +5,12 @@ import yaml
 import shutil
 import socket
 import sys
+import logging
 
 import paramiko
 import scp
+
+logging.raiseExceptions=False
 
 CLEANUP_AFTER = True
 TMP_DIR_PATH = 'tmp'
@@ -98,7 +101,7 @@ def main():
 
                 server_info_log(server['ip'], server['comment'], ', '.join(server_users))
 
-            except paramiko.ssh_exception.NoValidConnectionsError:
+            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
                 server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
             except paramiko.ssh_exception.PasswordRequiredException:
                 server_error_log(server['ip'], server['comment'],
