@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import json
+import logging
 import os
-import yaml
+import re
 import shutil
 import socket
 import sys
-import logging
+import yaml
 
 import paramiko
 import scp
@@ -15,8 +17,6 @@ logging.raiseExceptions=False
 
 CLEANUP_AFTER = True
 TMP_DIR_PATH = 'tmp'
-KEYS_FILE_NAME = 'config/keys.yml'
-SERVERS_FILE_NAME = 'config/servers.yml'
 TIMEOUT_ON_CONNECT = 2  # in seconds
 
 # Colors for console outputs
@@ -24,6 +24,9 @@ COLOR_RED = '\033[91m'
 COLOR_GREEN = '\033[92m'
 COLOR_END = '\033[0m'
 
+# File extension regex
+yaml_ext = re.compile("^\.ya?ml$")
+json_ext = re.compile("^\.json$")
 
 def cleanup():
     if os.path.exists(TMP_DIR_PATH):
@@ -49,24 +52,25 @@ def info_log(message):
 def server_info_log(ip, comment, users):
     info_log('%s/%s - %s' % (ip, comment, users))
 
+def read_config(config_file):
+    ext = os.path.splitext(config_file)[-1]
+    try:
+        if yaml_ext.match(ext):
+            return yaml.load(open(config_file))
+        elif json_ext.match(ext):
+            return json.load(open(config_file))
+        else:
+            error_log("Configuration file extension '%s' not supported. Please use .json or .yml." % ext)
+            sys.exit(1)
+    except (ValueError, yaml.scanner.ScannerError):
+        error_log('Cannot parse malformed configuration file.')
+        sys.exit(1)
+
 
 def main(args):
     # Load config files
-    try:
-        if SERVERS_FILE_NAME.endswith('.yml'):
-            servers = yaml.load(open(SERVERS_FILE_NAME))
-        else:
-            error_log('Configuration file extension not supported. Please use .json or .yml.')
-            return
-
-        if KEYS_FILE_NAME.endswith('.yml'):
-            keys = yaml.load(open(KEYS_FILE_NAME))
-        else:
-            error_log('Configuration file extension not supported. Please use .json or .yml.')
-            return
-    except yaml.scanner.ScannerError:
-        error_log('Cannot parse malformed YAML configuration file.')
-        return
+    servers = read_config(args.server)
+    keys = read_config(args.keys)
 
     for server in servers:
         if len(server['authorized_users']) > 0:
@@ -129,6 +133,10 @@ if __name__ == '__main__':
             description='A tool to automate key distribution with user authorization.')
     parser.add_argument('--dry-run', '-n', action='store_true',
             help='show pending changes without applying them')
+    parser.add_argument('--keys', '-k', default='config/keys.yml',
+            help="path to keys file (default: '%(default)s')")
+    parser.add_argument('--server', '-s', default='config/servers.yml',
+            help="path to server file (default: '%(default)s')")
     args = parser.parse_args()
 
     try:
