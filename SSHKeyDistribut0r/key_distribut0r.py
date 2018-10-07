@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import argparse
 import json
 import logging
 import os
 import re
-import shutil
 import socket
 import sys
 import yaml
@@ -15,8 +13,6 @@ import scp
 
 logging.raiseExceptions=False
 
-CLEANUP_AFTER = True
-TMP_DIR_PATH = 'tmp'
 TIMEOUT_ON_CONNECT = 2  # in seconds
 
 # Colors for console outputs
@@ -27,10 +23,6 @@ COLOR_END = '\033[0m'
 # File extension regex
 yaml_ext = re.compile("^\.ya?ml$")
 json_ext = re.compile("^\.json$")
-
-def cleanup():
-    if os.path.exists(TMP_DIR_PATH):
-        shutil.rmtree(TMP_DIR_PATH)
 
 
 def remove_special_chars(original_string):
@@ -67,7 +59,7 @@ def read_config(config_file):
         sys.exit(1)
 
 
-def main(args):
+def main(args, tmp_dir):
     # Load config files
     servers = read_config(args.server)
     keys = read_config(args.keys)
@@ -76,7 +68,7 @@ def main(args):
         if len(server['authorized_users']) > 0:
             # Generate key file for this server
             key_file_name = 'authorized_keys_%s' % remove_special_chars(server['comment'] + server['ip'])
-            key_file = open('%s/%s' % (TMP_DIR_PATH, key_file_name), 'w+')
+            key_file = open('%s/%s' % (tmp_dir, key_file_name), 'w+')
             server_users = []
 
             # Write all keys of users with permissions for this server
@@ -104,7 +96,7 @@ def main(args):
 
                     # Upload key file
                     remote_path = '.ssh/authorized_keys'
-                    scp_client.put('%s/%s' % (TMP_DIR_PATH, key_file_name), remote_path=remote_path)
+                    scp_client.put('%s/%s' % (tmp_dir, key_file_name), remote_path=remote_path)
                     scp_client.close()
 
                     server_info_log(server['ip'], server['comment'], ', '.join(server_users))
@@ -122,29 +114,3 @@ def main(args):
             server_error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
 
 
-if __name__ == '__main__':
-    print
-    print 'SSHKeyDistribut0r'
-    print '================='
-    print 'Welcome to the world of key distribution!'
-    print
-
-    parser = argparse.ArgumentParser(
-            description='A tool to automate key distribution with user authorization.')
-    parser.add_argument('--dry-run', '-n', action='store_true',
-            help='show pending changes without applying them')
-    parser.add_argument('--keys', '-k', default='config/keys.yml',
-            help="path to keys file (default: '%(default)s')")
-    parser.add_argument('--server', '-s', default='config/servers.yml',
-            help="path to server file (default: '%(default)s')")
-    args = parser.parse_args()
-
-    try:
-        cleanup()
-        os.makedirs(TMP_DIR_PATH)
-        main(args)
-        print
-        if CLEANUP_AFTER:
-            cleanup()
-    except KeyboardInterrupt:
-        sys.exit(1)

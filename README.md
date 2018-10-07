@@ -6,17 +6,23 @@ for sysop teams.
 ![Screenshot](http://i.imgur.com/qoKm9dl.png)
 
 # How to use
-## Install dependencies
+## Install
 ```
-pip install -r requirements.txt
+pip install SSHKeyDistribut0r
 ```
 
 ## Create configuration files
-First, copy the YAML files in the config directory and customize them.
-```
-cp keys.sample.yml keys.yml
-cp servers.sample.yml servers.yml
-```
+First, copy the YAML sample files to your users config directory and customize them.
+
+The sample files should be in
+`$HOME/.local/share/SSHKeyDistribut0r/config_sample`,
+`/usr/local/share/SSHKeyDistribut0r/config_sample` or
+`/usr/share/SSHKeyDistribut0r/config_sample`
+
+The config files need to be copied to `$USER_CONFIG_DIR/SSHKeyDistribut0r/`
+(`$HOME/.config/...` on most Linux systems, check `SSHKeyDistribut0r -h` for
+the location on your system)
+
 The keys.yml file has to contain all users which are used in the
 servers.yml file. Every entry in the YML structure requires the
 following attributes:
@@ -33,11 +39,10 @@ attributes:
 * `authorized_users`: List of strings which specify a user. Every user
     has to be declared in the keys.yml file as a key.
 
-## Execute SSHKeyDistribut0r
-```
-python key_distribut0r.py
-```
+## Usage
+Run `SSHKeyDistribut0r` to distribute your SSH keys :)
 
-## Dry run
-To verify your configuration, you can run `python key_distribut0r.py --dry-run`
-to see what would be changed whithout actually applying those changes.
+### Options
+- `--dry-run`/`-n`: To verify your configuration whithout actually applying those changes.
+- `--keys`/`-k`: Custom path to keys file
+- `--server`/`-s`: Custom path to server file
