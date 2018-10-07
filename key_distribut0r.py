@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import argparse
 import os
 import yaml
 import shutil
@@ -49,7 +50,7 @@ def server_info_log(ip, comment, users):
     info_log('%s/%s - %s' % (ip, comment, users))
 
 
-def main():
+def main(args):
     # Load config files
     try:
         if SERVERS_FILE_NAME.endswith('.yml'):
@@ -84,32 +85,35 @@ def main():
                         key_file.write('%s\n' % key)
             key_file.close()
 
-            # Configure SSH client
-            ssh_client = paramiko.SSHClient()
-            ssh_client.load_system_host_keys()  # Load host keys to check whether they are matching
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Add missing host keys automatically
-            try:
-                # Establish connection
-                ssh_client.connect(server['ip'], port=server['port'], username=server['user'],
-                                   timeout=TIMEOUT_ON_CONNECT)
-                scp_client = scp.SCPClient(ssh_client.get_transport())
-
-                # Upload key file
-                remote_path = '.ssh/authorized_keys'
-                scp_client.put('%s/%s' % (TMP_DIR_PATH, key_file_name), remote_path=remote_path)
-                scp_client.close()
-
+            if args.dry_run:
                 server_info_log(server['ip'], server['comment'], ', '.join(server_users))
+            else:
+                # Configure SSH client
+                ssh_client = paramiko.SSHClient()
+                ssh_client.load_system_host_keys()  # Load host keys to check whether they are matching
+                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Add missing host keys automatically
+                try:
+                    # Establish connection
+                    ssh_client.connect(server['ip'], port=server['port'], username=server['user'],
+                                       timeout=TIMEOUT_ON_CONNECT)
+                    scp_client = scp.SCPClient(ssh_client.get_transport())
 
-            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
-                server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
-            except paramiko.ssh_exception.PasswordRequiredException:
-                server_error_log(server['ip'], server['comment'],
-                                 'Cannot connect to server because of an authentication problem.')
-            except scp.SCPException:
-                server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
-            except socket.timeout:
-                server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
+                    # Upload key file
+                    remote_path = '.ssh/authorized_keys'
+                    scp_client.put('%s/%s' % (TMP_DIR_PATH, key_file_name), remote_path=remote_path)
+                    scp_client.close()
+
+                    server_info_log(server['ip'], server['comment'], ', '.join(server_users))
+
+                except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
+                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
+                except paramiko.ssh_exception.PasswordRequiredException:
+                    server_error_log(server['ip'], server['comment'],
+                                     'Cannot connect to server because of an authentication problem.')
+                except scp.SCPException:
+                    server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
+                except socket.timeout:
+                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:
             server_error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
 
@@ -120,10 +124,17 @@ if __name__ == '__main__':
     print '================='
     print 'Welcome to the world of key distribution!'
     print
+
+    parser = argparse.ArgumentParser(
+            description='A tool to automate key distribution with user authorization.')
+    parser.add_argument('--dry-run', '-n', action='store_true',
+            help='show pending changes without applying them')
+    args = parser.parse_args()
+
     try:
         cleanup()
         os.makedirs(TMP_DIR_PATH)
-        main()
+        main(args)
         print
         if CLEANUP_AFTER:
             cleanup()

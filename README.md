@@ -37,3 +37,7 @@ attributes:
 ```
 python key_distribut0r.py
 ```
+
+## Dry run
+To verify your configuration, you can run `python key_distribut0r.py --dry-run`
+to see what would be changed whithout actually applying those changes.
