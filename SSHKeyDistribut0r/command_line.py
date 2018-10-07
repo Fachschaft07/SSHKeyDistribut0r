@@ -9,7 +9,7 @@ from shutil import rmtree
 import sys
 
 
-TMP_DIR_PATH = '%s/tmp' % appdirs.user_data_dir
+TMP_DIR_PATH = '%s/tmp' % appdirs.user_data_dir()
 CLEANUP_AFTER = True
 
 def cleanup():
