@@ -3,4 +3,4 @@ ecdsa==0.13
 paramiko==1.16.0
 pycrypto==2.6.1
 pyyaml==3.11
-scp==0.10.2
+scp==0.11.0
