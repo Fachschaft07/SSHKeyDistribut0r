@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import SSHKeyDistribut0r
 
 import appdirs
@@ -9,11 +10,11 @@ import sys
 
 def main():
     prog = 'SSHKeyDistribut0r'
-    print
-    print prog
-    print '================='
-    print 'Welcome to the world of key distribution!'
-    print
+    print()
+    print(prog)
+    print('=================')
+    print('Welcome to the world of key distribution!')
+    print()
 
     parser = argparse.ArgumentParser(
             description='A tool to automate key distribution with user authorization.')
