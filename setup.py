@@ -3,8 +3,10 @@ from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
+name = 'SSHKeyDistribut0r'
+version = '0.1.0'
 
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
@@ -15,8 +17,8 @@ def get_requirements():
     return req
 
 
-setup(name='SSHKeyDistribut0r',
-      version='0.1.0',
+setup(name=name,
+      version=version,
       description='A tool which has been written to make SSH key distribution easier for sysop teams.',
       long_description=long_description,
       url='https://github.com/thomai/SSHKeyDistribut0r',
@@ -52,10 +54,10 @@ setup(name='SSHKeyDistribut0r',
       #package_data={
       #    'sample': ['package_data.dat'],
       #},
-      data_files=[('keys.yml', ['data/keys.yml']),
-                  ('servers.yml', ['data/servers.yml'])],
+      data_files=[('share/%s/config_sample' % name,
+          ['config/keys.sample.yml', 'config/servers.sample.yml'])],
       entry_points={
           'console_scripts': [
-              'SSHKeyDistribut0r=SSHKeyDistribut0r:main',
+              '%s = %s.command_line:main' % (name, name),
           ],
       },)
