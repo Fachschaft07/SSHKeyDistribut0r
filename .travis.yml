@@ -11,5 +11,5 @@ deploy:
   password:
     secure: o6iKbSPtr0WVIYw/d5B+mlQeWQtFPUWcFgQcOpo5WUUSEz+UbnT2v+GKf+Y22W62IfT5h9NXUCmw4xUGLiQbJC/2VqWFsygd/qaEtAogbpzCAzzBegb4vDd9sVVtpu4NgElAwX6pdXjH3fXSnlMugagJyOxZSrXjZSKsNk52M+plrN3CQzHXU2BuRW6uerRr/ODv8iV/+vY5Otna96unu0/V14NmOlfEUcYoQwRW9nqnUGdIx1EcN+9AZ0jNTy2oPiXUfGjc83HF2QI599GySTDcUjKp/uSPXUt60k1FGBqY5YW7OINXolqqfY7g1FbK04bEwWXh+a8YddmofU0No3XpmRwfWdmsAAuAIYwMDaJ6id7lKKtW3CtLQ8CuT+Jbik+Gc6iRs5cyFp+yWu9Og6d9fUJ+V5Dbahy+M7nNstTb5HyTImhfaDQ3QkHcBv/ldv5l/fNwG6iVmpEAun/1ZC+y2pCaTZmTf4y0vR9tWsIhHkuBKzQq8wgz8Ka1I4HS1CHt0Pp2jZh7j/+KVyYguj3zoIfP3kdICxy4LoElkiD+ESFbtPc9V6xRQXDjsSG5m0c2q0bdg0fd14elTkZ98T8VYcBFr8f5JJ2geGhzF2j3vEScx1+tDhETy9X0XzerDlDoKffy0Aw43XR6KXTGfY69WOrKh92P1tO0Iekvi3Q=
   on:
-  - branch: master
-  - tags: true
+    branch: master
+    tags: true
