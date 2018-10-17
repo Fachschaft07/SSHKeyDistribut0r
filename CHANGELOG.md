@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+Fixed version issues
+
+## 0.2.1
+Fixed version issues
+
 ## 0.2.0
 - Port to Python 3
 - Replaced temporary files with in-memory streams
