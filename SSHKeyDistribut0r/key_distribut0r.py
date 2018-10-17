@@ -45,6 +45,7 @@ def info_log(message):
 def server_info_log(ip, comment, users):
     info_log('%s/%s - %s' % (ip, comment, users))
 
+
 def read_config(config_file):
     ext = os.path.splitext(config_file)[-1]
     try:
@@ -93,9 +94,9 @@ def main(args):
                                        timeout=TIMEOUT_ON_CONNECT)
 
                     # Upload key file
-                    with SCPClient(ssh_client.get_transport()) as scp:
+                    with scp.SCPClient(ssh_client.get_transport()) as scp_client:
                         key_stream.seek(0)
-                        scp.putfo(key_stream, '.ssh/authorized_keys')
+                        scp_client.putfo(key_stream, '.ssh/authorized_keys')
 
                     key_stream.close()
                     server_info_log(server['ip'], server['comment'], ', '.join(server_users))
@@ -105,11 +106,9 @@ def main(args):
                 except paramiko.ssh_exception.PasswordRequiredException:
                     server_error_log(server['ip'], server['comment'],
                                      'Cannot connect to server because of an authentication problem.')
-                # except SCPException:
-                #     server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
+                except scp.SCPException:
+                    server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
                 except socket.timeout:
                     server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:
             server_error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
-
-
