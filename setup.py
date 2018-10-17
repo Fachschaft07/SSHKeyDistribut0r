@@ -4,7 +4,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 name = 'SSHKeyDistribut0r'
-version = '0.1.2'
+version = '0.2.0'
 
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -47,13 +47,6 @@ setup(name=name,
       keywords='ssh key distribution',
       packages=find_packages(exclude=['contrib', 'docs', 'tests']),
       install_requires=get_requirements(),
-      #extras_require={
-      #    'dev': ['check-manifest'],
-      #    'test': ['coverage'],
-      #},
-      #package_data={
-      #    'sample': ['package_data.dat'],
-      #},
       data_files=[('share/%s/config_sample' % name,
           ['config/keys.sample.yml', 'config/servers.sample.yml'])],
       entry_points={

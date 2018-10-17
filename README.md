@@ -44,6 +44,6 @@ attributes:
 Run `SSHKeyDistribut0r` to distribute your SSH keys :)
 
 ### Options
-- `--dry-run`/`-n`: To verify your configuration whithout actually applying those changes.
-- `--keys`/`-k`: Custom path to keys file
-- `--server`/`-s`: Custom path to server file
+* `--dry-run`/`-n`: To verify your configuration whithout actually applying those changes.
+* `--keys`/`-k`: Custom path to keys file
+* `--server`/`-s`: Custom path to server file

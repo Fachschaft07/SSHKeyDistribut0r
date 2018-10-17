@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+- Port to Python 3
+- Replaced temporary files with in-memory streams
+
 ## 0.1.2
 - MANIFEST added to resolve PyPI
 - Updated .gitignore
