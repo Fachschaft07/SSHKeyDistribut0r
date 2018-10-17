@@ -1,4 +1,5 @@
 [![CC BY](http://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by.svg)](http://creativecommons.org/licenses/by/4.0/)
+[![Build Status](https://travis-ci.org/thomai/SSHKeyDistribut0r.svg?branch=master)](https://travis-ci.org/thomai/SSHKeyDistribut0r)
 
 SSHKeyDistribut0r has been written to make SSH key distribution easier
 for sysop teams.
