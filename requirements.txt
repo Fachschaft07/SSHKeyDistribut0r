@@ -1,6 +1,6 @@
-appdirs==1.4.0
+appdirs==1.4.3
 ecdsa==0.13
-paramiko==1.16.0
+paramiko==2.4.2
 pycrypto==2.6.1
-pyyaml==3.11
-scp==0.11.0
+pyyaml==3.13
+scp==0.12.0

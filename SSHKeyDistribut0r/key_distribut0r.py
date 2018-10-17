@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import io
 import json
 import logging
@@ -12,7 +13,7 @@ import yaml
 import paramiko
 import scp
 
-logging.raiseExceptions=False
+logging.raiseExceptions = False
 
 TIMEOUT_ON_CONNECT = 2  # in seconds
 
@@ -22,8 +23,8 @@ COLOR_GREEN = '\033[92m'
 COLOR_END = '\033[0m'
 
 # File extension regex
-yaml_ext = re.compile("^\.ya?ml$")
-json_ext = re.compile("^\.json$")
+YAML_EXT = re.compile("^\\.ya?ml$")
+JSON_EXT = re.compile("^\\.json$")
 
 
 def remove_special_chars(original_string):
@@ -31,7 +32,7 @@ def remove_special_chars(original_string):
 
 
 def error_log(message):
-    print u'%s✗ Error: %s%s' % (COLOR_RED, message, COLOR_END)
+    print(u'%s✗ Error: %s%s' % (COLOR_RED, message, COLOR_END))
 
 
 def server_error_log(ip, comment, message):
@@ -39,7 +40,7 @@ def server_error_log(ip, comment, message):
 
 
 def info_log(message):
-    print u'%s✓ %s%s' % (COLOR_GREEN, message, COLOR_END)
+    print(u'%s✓ %s%s' % (COLOR_GREEN, message, COLOR_END))
 
 
 def server_info_log(ip, comment, users):
@@ -49,12 +50,13 @@ def server_info_log(ip, comment, users):
 def read_config(config_file):
     ext = os.path.splitext(config_file)[-1]
     try:
-        if yaml_ext.match(ext):
+        if YAML_EXT.match(ext):
             return yaml.load(open(config_file))
-        elif json_ext.match(ext):
+        elif JSON_EXT.match(ext):
             return json.load(open(config_file))
         else:
-            error_log("Configuration file extension '%s' not supported. Please use .json or .yml." % ext)
+            error_log("""Configuration file extension '%s' not supported.
+                    Please use .json or .yml.""" % ext)
             sys.exit(1)
     except (ValueError, yaml.scanner.ScannerError):
         error_log('Cannot parse malformed configuration file.')
@@ -67,9 +69,10 @@ def main(args):
     keys = read_config(args.keys)
 
     for server in servers:
-        if len(server['authorized_users']) > 0:
+        if server['authorized_users']:
             # Generate key file for this server
-            key_stream = io.BytesIO()
+            # key_stream = io.BytesIO()
+            key_stream = io.StringIO()
             server_users = []
 
             # Write all keys of users with permissions for this server
@@ -77,9 +80,9 @@ def main(args):
                 # user_name = '%s (%s)' % (keys[authorized_user]['fullname'], authorized_user)
                 user_name = authorized_user
                 server_users.append(user_name)
-                if authorized_user in keys.keys():
+                if authorized_user in list(keys.keys()):
                     for key in keys[authorized_user]['keys']:
-                        key_stream.write(b'%s\n' % key)
+                        key_stream.write('%s\n' % key)
 
             if args.dry_run:
                 server_info_log(server['ip'], server['comment'], ', '.join(server_users))
@@ -101,13 +104,13 @@ def main(args):
                     key_stream.close()
                     server_info_log(server['ip'], server['comment'], ', '.join(server_users))
 
-                except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
-                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
                 except paramiko.ssh_exception.PasswordRequiredException:
                     server_error_log(server['ip'], server['comment'],
                                      'Cannot connect to server because of an authentication problem.')
                 except scp.SCPException:
                     server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
+                except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
+                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
                 except socket.timeout:
                     server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:
