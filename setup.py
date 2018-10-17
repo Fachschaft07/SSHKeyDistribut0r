@@ -4,7 +4,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 name = 'SSHKeyDistribut0r'
-version = '0.2.0'
+version = '0.2.1'
 
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -29,8 +29,8 @@ setup(name=name,
                    'Intended Audience :: Developers',
                    'Intended Audience :: System Administrators',
                    'Programming Language :: Python',
-                   'Programming Language :: Python :: 2',
-                   'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3.6',
+                   'Programming Language :: Python :: 3.7',
                    'Programming Language :: Python',
                    'Operating System :: OS Independent',
                    'Topic :: Communications :: File Sharing',
