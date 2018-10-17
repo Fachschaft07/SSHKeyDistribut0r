@@ -1,6 +1,18 @@
 # Changelog
 
-## 0.0.2 (dev)
+## 0.1.2
+- MANIFEST added to resolve PyPI
+- Updated .gitignore
+
+## 0.1.1
+Travis CI integration
+
+## 0.1.0 (2018-10-13)
+- Dry run option
+- PyPI packaging
+- Cleaner config load
+
+## 0.0.2 (2016-11-02)
 Deprecated json configuration files
 
 ## 0.0.1 (2016-04-07)
