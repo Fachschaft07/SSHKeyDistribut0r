@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import io
 import json
 import logging
 import os
@@ -59,7 +60,7 @@ def read_config(config_file):
         sys.exit(1)
 
 
-def main(args, tmp_dir):
+def main(args):
     # Load config files
     servers = read_config(args.server)
     keys = read_config(args.keys)
@@ -67,8 +68,7 @@ def main(args, tmp_dir):
     for server in servers:
         if len(server['authorized_users']) > 0:
             # Generate key file for this server
-            key_file_name = 'authorized_keys_%s' % remove_special_chars(server['comment'] + server['ip'])
-            key_file = open('%s/%s' % (tmp_dir, key_file_name), 'w+')
+            key_stream = io.BytesIO()
             server_users = []
 
             # Write all keys of users with permissions for this server
@@ -78,8 +78,7 @@ def main(args, tmp_dir):
                 server_users.append(user_name)
                 if authorized_user in keys.keys():
                     for key in keys[authorized_user]['keys']:
-                        key_file.write('%s\n' % key)
-            key_file.close()
+                        key_stream.write(b'%s\n' % key)
 
             if args.dry_run:
                 server_info_log(server['ip'], server['comment'], ', '.join(server_users))
@@ -92,13 +91,13 @@ def main(args, tmp_dir):
                     # Establish connection
                     ssh_client.connect(server['ip'], port=server['port'], username=server['user'],
                                        timeout=TIMEOUT_ON_CONNECT)
-                    scp_client = scp.SCPClient(ssh_client.get_transport())
 
                     # Upload key file
-                    remote_path = '.ssh/authorized_keys'
-                    scp_client.put('%s/%s' % (tmp_dir, key_file_name), remote_path=remote_path)
-                    scp_client.close()
+                    with SCPClient(ssh_client.get_transport()) as scp:
+                        key_stream.seek(0)
+                        scp.putfo(key_stream, '.ssh/authorized_keys')
 
+                    key_stream.close()
                     server_info_log(server['ip'], server['comment'], ', '.join(server_users))
 
                 except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
@@ -106,8 +105,8 @@ def main(args, tmp_dir):
                 except paramiko.ssh_exception.PasswordRequiredException:
                     server_error_log(server['ip'], server['comment'],
                                      'Cannot connect to server because of an authentication problem.')
-                except scp.SCPException:
-                    server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
+                # except SCPException:
+                #     server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
                 except socket.timeout:
                     server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
         else:

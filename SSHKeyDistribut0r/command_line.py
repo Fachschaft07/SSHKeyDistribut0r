@@ -4,17 +4,8 @@ import SSHKeyDistribut0r
 
 import appdirs
 import argparse
-import os
-from shutil import rmtree
 import sys
 
-
-TMP_DIR_PATH = '%s/tmp' % appdirs.user_data_dir()
-CLEANUP_AFTER = True
-
-def cleanup():
-    if os.path.exists(TMP_DIR_PATH):
-        rmtree(TMP_DIR_PATH)
 
 def main():
     prog = 'SSHKeyDistribut0r'
@@ -37,10 +28,6 @@ def main():
     args = parser.parse_args()
 
     try:
-        cleanup()
-        os.makedirs(TMP_DIR_PATH)
-        SSHKeyDistribut0r.main(args, TMP_DIR_PATH)
-        if CLEANUP_AFTER:
-            cleanup()
+        SSHKeyDistribut0r.main(args)
     except KeyboardInterrupt:
         sys.exit(1)
