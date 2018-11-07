@@ -104,12 +104,18 @@ def main(args):
                     key_stream.close()
                     server_info_log(server['ip'], server['comment'], ', '.join(server_users))
 
-                except paramiko.ssh_exception.AuthenticationException:
-                    server_error_log(server['ip'], server['comment'],
-                                     'Cannot connect to server because of an authentication problem.')
                 except paramiko.ssh_exception.PasswordRequiredException:
-                    server_error_log(server['ip'], server['comment'],
-                                     'The private key file is protected by a passphrase, which is currently not supported.')
+                    server_error_log(
+                        server['ip'],
+                        server['comment'],
+                        'The private key file is protected by a passphrase, which is currently not supported.'
+                    )
+                except paramiko.ssh_exception.AuthenticationException:
+                    server_error_log(
+                        server['ip'],
+                        server['comment'],
+                        'Cannot connect to server because of an authentication problem.'
+                    )
                 except scp.SCPException:
                     server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
                 except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):

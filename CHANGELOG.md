@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.3
+Clarified exception messages
+
 ## 0.2.2
 Fixed version issues
 
