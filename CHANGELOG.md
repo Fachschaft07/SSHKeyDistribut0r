@@ -3,6 +3,7 @@
 ## 0.2.3
 - Clarified exception messages
 - Fixed Python 2.7 issues
+- Updated requirements
 
 ## 0.2.2
 Fixed version issues
