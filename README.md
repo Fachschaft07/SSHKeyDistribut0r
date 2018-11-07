@@ -43,6 +43,10 @@ attributes:
 ## Usage
 Run `SSHKeyDistribut0r` to distribute your SSH keys :)
 
+Note, that a pre-installed public key on the server side with a corresponding
+private key (without a passphrase or pre-loaded into a local key agent) is
+required for SSHKeyDistribut0r to work.
+
 ### Options
 * `--dry-run`/`-n`: To verify your configuration whithout actually applying those changes.
 * `--keys`/`-k`: Custom path to keys file
