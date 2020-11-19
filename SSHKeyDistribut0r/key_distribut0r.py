@@ -8,10 +8,11 @@ import os
 import re
 import socket
 import sys
-import yaml
+import csv
 
 import paramiko
 import scp
+import yaml
 
 logging.raiseExceptions = False
 
@@ -25,6 +26,9 @@ COLOR_END = '\033[0m'
 # File extension regex
 YAML_EXT = re.compile("^\\.ya?ml$")
 JSON_EXT = re.compile("^\\.json$")
+
+ERROR_STATUS = '✗ Error'
+SUCCESS_STATUS = '✓ Success'
 
 
 def remove_special_chars(original_string):
@@ -63,10 +67,21 @@ def read_config(config_file):
         sys.exit(1)
 
 
+def create_result_csv_table(messages):
+    messages.sort(key=lambda m: m[0] == ERROR_STATUS)
+    try:
+        with open('ssh_keys_distributor_result.csv', 'w', encoding='utf-8') as file:
+            writer = csv.writer(file, delimiter='|')
+            writer.writerows(messages)
+    except OSError as e:
+        print(e)
+
+
 def main(args):
     # Load config files
     servers = read_config(args.server)
     keys = read_config(args.keys)
+    messages = [('Status', 'Ip', 'Comment', 'Description')]
 
     for server in servers:
         if server['authorized_users']:
@@ -85,7 +100,9 @@ def main(args):
                         key_stream.write('%s\n' % key)
 
             if args.dry_run:
-                server_info_log(server['ip'], server['comment'], ', '.join(server_users))
+                msg = server['ip'], server['comment'], ', '.join(server_users)
+                server_info_log(*msg)
+                messages.append((SUCCESS_STATUS, *msg))
             else:
                 # Configure SSH client
                 ssh_client = paramiko.SSHClient()
@@ -102,25 +119,37 @@ def main(args):
                         scp_client.putfo(key_stream, '.ssh/authorized_keys')
 
                     key_stream.close()
-                    server_info_log(server['ip'], server['comment'], ', '.join(server_users))
+                    msg = server['ip'], server['comment'], ', '.join(server_users)
+                    server_info_log(*msg)
+                    messages.append((SUCCESS_STATUS, *msg))
 
                 except paramiko.ssh_exception.PasswordRequiredException:
-                    server_error_log(
-                        server['ip'],
-                        server['comment'],
-                        'The private key file is protected by a passphrase, which is currently not supported.'
-                    )
+                    msg = server['ip'], \
+                          server['comment'], \
+                          'The private key file is protected by a passphrase, which is currently not supported.'
+                    server_error_log(*msg)
+                    messages.append((ERROR_STATUS, msg))
                 except paramiko.ssh_exception.AuthenticationException:
-                    server_error_log(
-                        server['ip'],
-                        server['comment'],
-                        'Cannot connect to server because of an authentication problem.'
-                    )
+                    msg = server['ip'],\
+                          server['comment'], \
+                          'Cannot connect to server because of an authentication problem.'
+                    server_error_log(*msg)
+                    messages.append((ERROR_STATUS, *msg))
                 except scp.SCPException:
-                    server_error_log(server['ip'], server['comment'], 'Cannot send file to server.')
+                    msg = server['ip'], server['comment'], 'Cannot send file to server.'
+                    server_error_log(*msg)
+                    messages.append((ERROR_STATUS, *msg))
                 except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.SSHException):
-                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server.')
+                    msg = server['ip'], server['comment'], 'Cannot connect to server.'
+                    server_error_log(*msg)
+                    messages.append((ERROR_STATUS, *msg))
                 except socket.timeout:
-                    server_error_log(server['ip'], server['comment'], 'Cannot connect to server because of a timeout.')
+                    msg = server['ip'], server['comment'], 'Cannot connect to server because of a timeout.'
+                    server_error_log(*msg)
+                    messages.append((ERROR_STATUS, *msg))
         else:
-            server_error_log(server['ip'], server['comment'], 'No user mentioned in configuration file!')
+            msg = server['ip'], server['comment'], 'No user mentioned in configuration file!'
+            server_error_log(*msg)
+            messages.append((ERROR_STATUS, *msg))
+    create_result_csv_table(messages)
+
