@@ -55,8 +55,8 @@ def read_config(config_file):
         elif JSON_EXT.match(ext):
             return json.load(open(config_file))
         else:
-            error_log("""Configuration file extension '%s' not supported.
-                    Please use .json or .yml.""" % ext)
+            error_log("Configuration file extension '%s' not supported." \
+                      " Please use .json or .yml." % ext)
             sys.exit(1)
     except (ValueError, yaml.scanner.ScannerError):
         error_log('Cannot parse malformed configuration file.')
@@ -84,7 +84,8 @@ def main(args):
                     for key in keys[authorized_user]['keys']:
                         key_stream.write('%s\n' % key)
                 else:
-                    error_log(" ".join(["User",authorized_user,"doesn't exists in keys.yml"])
+                    error_log("Cannot find user '%s' in the key configuration file" \
+                              " for '%s/%s'." % (authorized_user, server['ip'], server['comment']))
                     sys.exit(1)
 
             if args.dry_run:
