@@ -51,3 +51,15 @@ required for SSHKeyDistribut0r to work.
 * `--dry-run`/`-n`: To verify your configuration whithout actually applying those changes.
 * `--keys`/`-k`: Custom path to keys file
 * `--server`/`-s`: Custom path to server file
+
+# New Release
+## Build Python Package
+* Update version in `setup.py`
+* Install package builder: `pip install build`
+* Build package: `python -m build`
+* Installation: `pip install ./dist/SSHKeyDistribut0r-<version>.tar.gz`
+* Do tests
+
+## Upload to PyPI
+* Install twine: `pip install twine`
+* Upload: `twine upload dist/*`
