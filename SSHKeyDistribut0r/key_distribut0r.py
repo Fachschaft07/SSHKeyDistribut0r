@@ -84,8 +84,8 @@ def main(args):
                     for key in keys[authorized_user]['keys']:
                         key_stream.write('%s\n' % key)
                 else:
-                  print("User " + authorized_user +" doesn't exists in keys.yml")
-                  return -1
+                    error_log(" ".join(["User",authorized_user,"doesn't exists in keys.yml"])
+                    sys.exit(1)
 
             if args.dry_run:
                 server_info_log(server['ip'], server['comment'], ', '.join(server_users))
