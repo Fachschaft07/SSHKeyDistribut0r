@@ -75,3 +75,4 @@ required for SSHKeyDistribut0r to work.
 * `git push`
 * Set version tag: `git tag x.x.x`
 * `git push --tags`
+
