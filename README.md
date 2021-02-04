@@ -54,7 +54,9 @@ required for SSHKeyDistribut0r to work.
 
 # New Release
 ## Build Python Package
+* Update `CHANGELOG.md`
 * Update version in `setup.py`
+* Update `CONTRIBUTORS.md`
 * Install package builder: `pip install build`
 * Build package: `python -m build`
 * Installation: `pip install ./dist/SSHKeyDistribut0r-<version>.tar.gz`
@@ -62,4 +64,14 @@ required for SSHKeyDistribut0r to work.
 
 ## Upload to PyPI
 * Install twine: `pip install twine`
-* Upload: `twine upload dist/*`
+* Upload: `twine upload ./dist/SSHKeyDistribut0r-<version>.tar.gz`
+
+## Git Stuff
+* `git add .`
+* Commit new version: `git commit -m "Version x.x.x"`
+* `git push`
+* `git checkout master`
+* Update master branch: `git merge develop`
+* `git push`
+* Set version tag: `git tag x.x.x`
+* `git push --tags`

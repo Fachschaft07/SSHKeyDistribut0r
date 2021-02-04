@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.5 (2021-02-05)
+New version number required because of PyPI upload issues
+
+## 0.2.4 (2021-02-04)
+- Error if users in key and server configuration do not match
+- Updated README
+
 ## 0.2.3
 - Clarified exception messages
 - Fixed Python 2.7 issues
