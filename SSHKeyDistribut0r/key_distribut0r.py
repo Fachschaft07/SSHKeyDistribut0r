@@ -27,8 +27,8 @@ COLOR_END = '\033[0m'
 YAML_EXT = re.compile("^\\.ya?ml$")
 JSON_EXT = re.compile("^\\.json$")
 
-ERROR_STATUS = '✗ Error'
-SUCCESS_STATUS = '✓ Success'
+ERROR_STATUS = 'Error'
+SUCCESS_STATUS = 'Success'
 
 
 def remove_special_chars(original_string):
@@ -67,10 +67,37 @@ def read_config(config_file):
         sys.exit(1)
 
 
-def create_result_csv_table(messages):
+def get_maximum_column_lengths(messages):
+    column_count = len(messages[0])
+    column_max_lens = {i: max(len(message[i]) for message in messages) for i in range(column_count)}
+    return column_max_lens
+
+
+def print_table_log(messages):
+
     messages.sort(key=lambda m: m[0] == ERROR_STATUS)
+
+    max_column_lens = get_maximum_column_lengths(messages)
+
+    def print_borderline():
+        column_count = len(messages[0])
+        empty_columns = ('' for _ in range(column_count))
+        print("+{:-^{lens[0]}}+{:-^{lens[1]}}+{:-^{lens[2]}}+{:-^{lens[3]}}+".format(*empty_columns,
+                                                                                     lens=max_column_lens))
+    print()
+    print_borderline()
+    for message in messages[1:]:
+        color_on = COLOR_RED if message[0] == ERROR_STATUS else COLOR_GREEN
+        clear_message = (re.sub(r'\s+', ' ', col) for col in message)
+        print("|{color_on}{:^{lens[0]}}{color_off}"
+              "|{:^{lens[1]}}|{:^{lens[2]}}"
+              "|{:^{lens[3]}}|".format(*clear_message, color_on=color_on, color_off=COLOR_END, lens=max_column_lens))
+        print_borderline()
+
+
+def export_to_csv(path, messages):
     try:
-        with open('ssh_keys_distributor_result.csv', 'w', encoding='utf-8') as file:
+        with open(path, 'w', encoding='utf-8') as file:
             writer = csv.writer(file, delimiter='|')
             writer.writerows(messages)
     except OSError as e:
@@ -151,5 +178,7 @@ def main(args):
             msg = server['ip'], server['comment'], 'No user mentioned in configuration file!'
             server_error_log(*msg)
             messages.append((ERROR_STATUS, *msg))
-    create_result_csv_table(messages)
+    print_table_log(messages)
+    if args.export_csv_path:
+        export_to_csv(args.export_csv_path, messages)
 

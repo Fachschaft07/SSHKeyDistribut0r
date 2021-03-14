@@ -16,16 +16,17 @@ def main():
     print('Welcome to the world of key distribution!')
     print()
 
-    parser = argparse.ArgumentParser(
-            description='A tool to automate key distribution with user authorization.')
+    parser = argparse.ArgumentParser(description='A tool to automate key distribution with user authorization.')
     parser.add_argument('--dry-run', '-n', action='store_true',
-            help='show pending changes without applying them')
+                        help='show pending changes without applying them')
     parser.add_argument('--keys', '-k',
-            default='%s/%s/keys.yml' % (appdirs.user_config_dir(), prog),
-            help="path to keys file\n(default: '%(default)s')")
+                        default='%s/%s/keys.yml' % (appdirs.user_config_dir(), prog),
+                        help="path to keys file\n(default: '%(default)s')")
     parser.add_argument('--server', '-s',
-            default='%s/%s/servers.yml' % (appdirs.user_config_dir(), prog),
-            help="path to server file (default: '%(default)s')")
+                        default='%s/%s/servers.yml' % (appdirs.user_config_dir(), prog),
+                        help="path to server file (default: '%(default)s')")
+    parser.add_argument('--export-csv-path', '-f',
+                        help="path to csv export file (example: 'keys_distributor_result.csv')")
     args = parser.parse_args()
 
     try:
